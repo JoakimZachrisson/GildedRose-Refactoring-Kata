@@ -3,6 +3,8 @@ import enum
 
 import numpy as np
 
+__all__ = ["GildedRose", "Item"]
+
 
 class Item:
     def __init__(self, name, sell_in, quality):
@@ -18,7 +20,6 @@ class _Name(str, enum.Enum):
     AGED_BRIE = "Aged Brie"
     SULFURAS = "Sulfuras, Hand of Ragnaros"
     BACKSTAGE_PASSES = "Backstage passes to a TAFKAL80ETC concert"
-
 
 
 class _ItemWrapper:
