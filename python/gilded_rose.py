@@ -1,5 +1,4 @@
 import abc
-import dataclasses
 import enum
 
 import numpy as np
@@ -70,12 +69,18 @@ class _Sulfuras(_ItemWrapper):
 
 
 def wrap(item: Item) -> _ItemWrapper:
-    factory_map = {
-        _Name.AGED_BRIE: _AgedBrie,
-        _Name.SULFURAS: _Sulfuras,
-        _Name.BACKSTAGE_PASSES: _BackstagePasses,
-    }
-    factory_method = factory_map.get(item.name, _Generic)
+    if _Name.AGED_BRIE in item.name:
+        factory_method = _AgedBrie
+    elif _Name.SULFURAS in item.name:
+        factory_method = _Sulfuras
+    elif _Name.BACKSTAGE_PASSES in item.name:
+        factory_method = _BackstagePasses
+    else:
+        factory_method = _Generic
+
+    # TODO: implement cojured as a flag, or a base class functionality or bool flag
+    is_conjured = item.name.lower().startswith("conjured")
+
     return factory_method(item=item)
 
 
