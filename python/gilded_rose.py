@@ -35,26 +35,28 @@ class _ItemWrapper:
     def expired(self) -> bool:
         return self.item.sell_in < 0
 
-    @abc.abstractmethod
     def update(self) -> None:
+        self.item.sell_in -= 1
+        decrease_amount = self.compute_quality_decrease()
+        self.decrease_quality(decrease_amount)
+
+    @abc.abstractmethod
+    def compute_quality_decrease(self) -> int:
         ...
 
 
 class _Generic(_ItemWrapper):
-    def update(self):
-        self.item.sell_in -= 1
-        self.decrease_quality(2 if self.expired else 1)
+    def compute_quality_decrease(self):
+        return 2 if self.expired else 1
 
 
 class _AgedBrie(_ItemWrapper):
-    def update(self):
-        self.item.sell_in -= 1
-        self.decrease_quality(-2 if self.expired else -1)
+    def compute_quality_decrease(self):
+        return -2 if self.expired else -1
 
 
 class _BackstagePasses(_ItemWrapper):
-    def update(self):
-        self.item.sell_in -= 1
+    def compute_quality_decrease(self):
         if self.item.sell_in >= 10:
             amount = -1
         elif 5 <= self.item.sell_in < 10:
@@ -63,10 +65,13 @@ class _BackstagePasses(_ItemWrapper):
             amount = -3
         else:
             amount = self.item.quality
-        self.decrease_quality(amount)
+        return amount
 
 
 class _Sulfuras(_ItemWrapper):
+    def compute_quality_decrease(self) -> int:
+        return 0
+
     def update(self) -> None:
         ...
 
