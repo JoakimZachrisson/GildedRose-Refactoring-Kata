@@ -153,6 +153,15 @@ def test_backstage_passes():
     assert items[0].quality == 0
 
 
+def test_sulfuras_doesnt_decrease_sell_in() -> None:
+    item = Item("Sulfuras, Hand of Ragnaros", 10, 80)
+    gilded_rose = GildedRose([item])
+    for _ in range(10):
+        gilded_rose.update_quality()
+    assert item.sell_in == 10
+    assert item.quality == 80
+
+
 @pytest.mark.skip(reason="not implemented")
 @pytest.mark.parametrize(
     "name", ["foo", "Aged Brie", "Backstage passes to a TAFKAL80ETC concert", "Sulfuras, Hand of Ragnaros"]
