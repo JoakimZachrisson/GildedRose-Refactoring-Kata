@@ -153,13 +153,14 @@ def test_backstage_passes():
     assert items[0].quality == 0
 
 
-def test_sulfuras_doesnt_decrease_sell_in() -> None:
-    item = Item("Sulfuras, Hand of Ragnaros", 10, 80)
+@pytest.mark.parametrize("sell_in, quality", [(10, 20), (1, 1337), (-1, -10)])
+def test_sulfuras_doesnt_change(sell_in: int, quality: int) -> None:
+    item = Item("Sulfuras, Hand of Ragnaros", sell_in, quality)
     gilded_rose = GildedRose([item])
     for _ in range(10):
         gilded_rose.update_quality()
-    assert item.sell_in == 10
-    assert item.quality == 80
+    assert item.sell_in == sell_in
+    assert item.quality == quality
 
 
 @pytest.mark.skip(reason="not implemented")
