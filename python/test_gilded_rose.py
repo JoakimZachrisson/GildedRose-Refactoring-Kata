@@ -163,19 +163,15 @@ def test_sulfuras_doesnt_change(sell_in: int, quality: int) -> None:
     assert item.quality == quality
 
 
-@pytest.mark.skip(reason="not implemented")
 @pytest.mark.parametrize(
     "name", ["foo", "Aged Brie", "Backstage passes to a TAFKAL80ETC concert", "Sulfuras, Hand of Ragnaros"]
 )
 def test_conjured(name: str):
-    items = [
-        Item(name, sell_in=20, quality=25),
-        Item(f"Conjured {name}", sell_in=20, quality=25),
-    ]
-    gilded_rose = GildedRose(items)
+    regular = Item(name, sell_in=20, quality=25)
+    conjured = Item(f"Conjured {name}", sell_in=20, quality=25)
+    gilded_rose = GildedRose([regular, conjured])
 
     for _ in range(5):
-        regular, conjured = items
         prev_regular_quality, prev_conjured_quality = regular.quality, conjured.quality
 
         gilded_rose.update_quality()

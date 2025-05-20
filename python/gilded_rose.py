@@ -25,6 +25,11 @@ class _Name(str, enum.Enum):
 class _ItemWrapper:
     def __init__(self, item: Item) -> None:
         self.item = item
+        self._is_conjured = item.name.lower().startswith("conjured")
+
+    def decrease_quality(self, amount: int) -> None:
+        amount = amount * 2 if self._is_conjured else amount
+        self.item.quality = np.clip(self.item.quality - amount, 0, 50)
 
     @property
     def expired(self) -> bool:
@@ -38,30 +43,27 @@ class _ItemWrapper:
 class _Generic(_ItemWrapper):
     def update(self):
         self.item.sell_in -= 1
-        new_quality = self.item.quality - (2 if self.expired else 1)
-        self.item.quality = np.clip(new_quality, 0, 50)
+        self.decrease_quality(2 if self.expired else 1)
 
 
 class _AgedBrie(_ItemWrapper):
     def update(self):
         self.item.sell_in -= 1
-        new_quality = self.item.quality + (2 if self.expired else 1)
-        self.item.quality = np.clip(new_quality, 0, 50)
+        self.decrease_quality(-2 if self.expired else -1)
 
 
 class _BackstagePasses(_ItemWrapper):
     def update(self):
         self.item.sell_in -= 1
         if self.item.sell_in >= 10:
-            quality_increase = 1
+            amount = -1
         elif 5 <= self.item.sell_in < 10:
-            quality_increase = 2
+            amount = -2
         elif 0 <= self.item.sell_in < 5:
-            quality_increase = 3
+            amount = -3
         else:
-            quality_increase = -self.item.quality
-        new_quality = self.item.quality + quality_increase
-        self.item.quality = np.clip(new_quality, 0, 50)
+            amount = self.item.quality
+        self.decrease_quality(amount)
 
 
 class _Sulfuras(_ItemWrapper):
@@ -78,9 +80,6 @@ def wrap(item: Item) -> _ItemWrapper:
         factory_method = _BackstagePasses
     else:
         factory_method = _Generic
-
-    # TODO: implement cojured as a flag, or a base class functionality or bool flag
-    is_conjured = item.name.lower().startswith("conjured")
 
     return factory_method(item=item)
 
